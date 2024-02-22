@@ -40,7 +40,7 @@ const MainMap = () => {
 
       console.log(lat, lng);
 
-      const url = 'http://localhost:8080/pedHandler'; // 엔드포인트 주소에 맞게 수정 47.186.58.92:52779
+      const url = 'http://localhost:8888/pedHandler'; // 엔드포인트 주소에 맞게 수정 47.186.58.92:52779
 
       try {
         const response = await fetch(url, {

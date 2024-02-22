@@ -5,7 +5,7 @@ import { UrbrFront } from 'urbr_wasm';
 const MainMap = () => {
   const [urbrFront, setUrbrFront] = useState(null);
   const [numParameters, setNumParameters] = useState(null);
-  const [output, setOutput] = useState(null);
+  const [from, setFrom] = useState(null);
 
   const [lat, setLat] = useState();
   const [lng, setLng] = useState();
@@ -44,7 +44,7 @@ const MainMap = () => {
       console.log(lat, lng, out_buffer);
 
       // 서버로 전송할 output
-      setOutput(out_buffer);
+      setFrom(out_buffer);
 
     } catch (error) {
       console.error('Error getting position from SILS server:', error);
@@ -55,22 +55,22 @@ const MainMap = () => {
     // 현재 위치 가져오기 및 서버로 위치 전송
     const sendCurrentPositionToServer = async (position) => {
       const { latitude, longitude } = position.coords;
-      const userID = sessionStorage.getItem('user_id');
+      const id = sessionStorage.getItem('user_id');
       setLat(latitude);
       setLng(longitude);
 
-      // const urbr       = new UrbrFront       (); // LSTM 수행하는 객체 만들기
-      // const out_buffer = UrbrFront.out_buffer(); // LSTM 출력 버퍼 (크기 100짜리 Float32Array)
+      const urbr       = new UrbrFront       (); // LSTM 수행하는 객체 만들기
+      const out_buffer = UrbrFront.out_buffer(); // LSTM 출력 버퍼 (크기 100짜리 Float32Array)
 
-      // // 수행하고 나면 output에 100개가 담김
-      // urbr.inference(lat, lng, out_buffer);
+      // 수행하고 나면 output에 100개가 담김
+      urbr.inference(lat, lng, out_buffer);
 
-      // console.log(lat, lng, out_buffer);
+      console.log(lat, lng, out_buffer);
 
-      // // 서버로 전송할 output
-      // setOutput(out_buffer);
+      // 서버로 전송할 output
+      setFrom(out_buffer);
 
-      const url = 'http://localhost:8080/pedHandler';//'http://localhost:8080/pedHandler'; // 엔드포인트 주소에 맞게 수정
+      const url = 'http://localhost:8888/pedHandler';//'http://localhost:8888/pedHandler'; // 엔드포인트 주소에 맞게 수정
 
       try {
         const response = await fetch(url, {
@@ -79,8 +79,8 @@ const MainMap = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            userID,
-            output,
+            id,
+            from: Array.from(out_buffer),
           }),
         });
 
@@ -146,7 +146,7 @@ const MainMap = () => {
       console.log(lat, lng, out_buffer);
 
       // 서버로 전송할 output
-      setOutput(out_buffer);
+      setFrom(out_buffer);
       
       return () => {
         navigator.geolocation.clearWatch(watchPositionId);
@@ -165,6 +165,7 @@ const MainMap = () => {
   }, [lat, lng]);
 
 	function checkForCollision(sessionUUID, serverUUIDs) {
+    // console.log("check1")
 		// Check if session UUID is present in server UUIDs
 		const isCollision = serverUUIDs.includes(sessionUUID);
 
@@ -172,6 +173,7 @@ const MainMap = () => {
 		  // Trigger collision warning
 		  setModal1(true);
 		}
+    // console.log("check2")
 	}
 
   return (
