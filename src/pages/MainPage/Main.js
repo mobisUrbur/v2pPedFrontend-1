@@ -40,7 +40,7 @@ const Main = () => {
 						{
 							<div className="item">
 							<div className="thumb">
-								<MainMap />
+								<SILSMap />
 							</div>
 						</div>
 						}
